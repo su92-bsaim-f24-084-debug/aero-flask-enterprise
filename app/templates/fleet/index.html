@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Fleet Management{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-bold text-navy mb-1"><i class="bi bi-airplane-engines me-2 text-sky"></i> Commercial Fleet Roster</h3>
+            <p class="text-muted small mb-0">Active and retired aircraft inventory across all operational bases</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('fleet.index', show_deleted='1' if not show_deleted else '0') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-eye me-1"></i> {{ 'Show Active Only' if show_deleted else 'Show Archived / Soft-Deleted' }}
+            </a>
+            {% if g.user and g.user.is_admin() %}
+                <a href="{{ url_for('fleet.create') }}" class="btn btn-sky btn-sm text-navy fw-semibold px-3">
+                    <i class="bi bi-plus-lg me-1"></i> Add Aircraft
+                </a>
+            {% endif %}
+            <a href="{{ url_for('fleet.maintenance') }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-wrench-adjustable me-1"></i> Maintenance Logs
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Tail #</th>
+                        <th>Model</th>
+                        <th>Manufacturer</th>
+                        <th>Capacity</th>
+                        <th>Range</th>
+                        <th>Flight Hours</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for a in aircrafts %}
+                        <tr class="{{ 'table-secondary opacity-75' if a.is_deleted else '' }}">
+                            <td>
+                                <a href="{{ url_for('fleet.details', id=a.id) }}" class="fw-bold text-decoration-none">
+                                    {{ a.tail_number }}
+                                </a>
+                                {% if a.is_deleted %}
+                                    <span class="badge bg-danger ms-1">Soft Deleted</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ a.model.model_name }}</td>
+                            <td class="text-muted small">{{ a.model.manufacturer.name }}</td>
+                            <td><span class="badge bg-light text-dark">{{ a.model.seating_capacity }} seats</span></td>
+                            <td class="small">{{ a.model.max_range_km }} km</td>
+                            <td class="small">{{ "%.1f"|format(a.total_flight_hours) }} hrs</td>
+                            <td>
+                                {% if a.status == 'Active' %}
+                                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                {% elif a.status == 'Maintenance' %}
+                                    <span class="badge bg-warning bg-opacity-10 text-warning">Maintenance</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ a.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <a href="{{ url_for('fleet.details', id=a.id) }}" class="btn btn-sm btn-outline-secondary">View</a>
+                                {% if g.user and g.user.is_admin() %}
+                                    {% if not a.is_deleted %}
+                                        <a href="{{ url_for('fleet.edit', id=a.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                        <form action="{{ url_for('fleet.delete', id=a.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Execute soft delete on this aircraft?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">Soft Delete</button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{{ url_for('fleet.restore', id=a.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-outline-success">Restore</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">No aircraft registered.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

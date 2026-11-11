@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% block title %}Aircraft {{ aircraft.tail_number }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1"><i class="bi bi-airplane me-2 text-sky"></i> Tail {{ aircraft.tail_number }}</h3>
+            <span class="badge {{ 'bg-success' if aircraft.status == 'Active' else 'bg-warning' }}">{{ aircraft.status }}</span>
+            {% if aircraft.is_deleted %}
+                <span class="badge bg-danger">Soft-Deleted</span>
+            {% endif %}
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('fleet.index') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to Fleet</a>
+            {% if g.user and g.user.is_admin() and not aircraft.is_deleted %}
+                <a href="{{ url_for('fleet.edit', id=aircraft.id) }}" class="btn btn-primary btn-sm">Edit Aircraft</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <small class="text-muted">Aircraft Model</small>
+                <h5 class="fw-bold text-navy mb-0">{{ aircraft.model.model_name }}</h5>
+                <small class="text-muted">{{ aircraft.model.manufacturer.name }}</small>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <small class="text-muted">Serial Number</small>
+                <h5 class="fw-bold text-navy mb-0">{{ aircraft.serial_number }}</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <small class="text-muted">Total Flight Hours</small>
+                <h5 class="fw-bold text-navy mb-0">{{ "%.1f"|format(aircraft.total_flight_hours) }} hrs</h5>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <small class="text-muted">Manufacture Date</small>
+                <h5 class="fw-bold text-navy mb-0">{{ aircraft.manufacture_date.strftime('%b %d, %Y') }}</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- Maintenance Records Section -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="fw-bold text-navy mb-0"><i class="bi bi-tools text-primary me-2"></i> Maintenance History</h5>
+            {% if g.user and g.user.is_admin() and not aircraft.is_deleted %}
+                <a href="{{ url_for('fleet.new_maintenance') }}" class="btn btn-sm btn-outline-primary">Schedule Inspection</a>
+            {% endif %}
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Inspection Code</th>
+                        <th>Type</th>
+                        <th>Scheduled Date</th>
+                        <th>Completed Date</th>
+                        <th>Lead Technician</th>
+                        <th>Status</th>
+                        <th>Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in logs %}
+                        <tr>
+                            <td><span class="badge bg-secondary">{{ m.maintenance_type.code }}</span></td>
+                            <td class="fw-semibold">{{ m.maintenance_type.name }}</td>
+                            <td>{{ m.scheduled_date.strftime('%b %d, %Y') }}</td>
+                            <td>{{ m.completed_date.strftime('%b %d, %Y') if m.completed_date else 'Pending' }}</td>
+                            <td>{{ m.lead_technician }}</td>
+                            <td>
+                                {% if m.status == 'Completed' or m.status == 'Signed Off' %}
+                                    <span class="badge bg-success">{{ m.status }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">{{ m.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>${{ "%.2f"|format(m.cost_estimate) }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No maintenance records logged for this aircraft.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

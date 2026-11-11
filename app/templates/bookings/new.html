@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Complete Your Flight Reservation{% endblock %}
+
+{% block content %}
+<div class="bg-navy py-4 text-white">
+    <div class="container">
+        <h3 class="fw-bold mb-1"><i class="bi bi-ticket-perforated me-2 text-sky"></i> Passenger Details & Confirmation</h3>
+        <p class="text-light text-opacity-75 small mb-0">Flight {{ flight.schedule.flight_number }}: {{ flight.schedule.route.origin_airport.iata_code }} &rarr; {{ flight.schedule.route.destination_airport.iata_code }} ({{ flight.flight_date.strftime('%b %d, %Y') }})</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    <div class="row gy-4">
+        <div class="col-lg-8">
+            <div class="card p-4 shadow-sm border-0 rounded-3">
+                <h5 class="fw-bold text-navy mb-3"><i class="bi bi-person-fill text-sky me-2"></i> Primary Passenger Information</h5>
+                
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.first_name.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.first_name(class="form-control" + (" is-invalid" if form.first_name.errors else ""), placeholder="As shown on passport") }}
+                            {% for error in form.first_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.last_name.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.last_name(class="form-control" + (" is-invalid" if form.last_name.errors else ""), placeholder="As shown on passport") }}
+                            {% for error in form.last_name.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            {{ form.gender.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.gender(class="form-select") }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.date_of_birth.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.date_of_birth(class="form-control" + (" is-invalid" if form.date_of_birth.errors else "")) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.nationality.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.nationality(class="form-control" + (" is-invalid" if form.nationality.errors else ""), placeholder="e.g. United States") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form.passport_number.label(class="form-label small fw-semibold text-muted") }}
+                        {{ form.passport_number(class="form-control" + (" is-invalid" if form.passport_number.errors else ""), placeholder="Passport / ID document #") }}
+                        {% for error in form.passport_number.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <h5 class="fw-bold text-navy mb-3"><i class="bi bi-shield-plus text-danger me-2"></i> Mandatory Emergency Contact</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            {{ form.emergency_name.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.emergency_name(class="form-control" + (" is-invalid" if form.emergency_name.errors else "")) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.emergency_phone.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.emergency_phone(class="form-control" + (" is-invalid" if form.emergency_phone.errors else "")) }}
+                        </div>
+                        <div class="col-md-4">
+                            {{ form.emergency_relation.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.emergency_relation(class="form-control" + (" is-invalid" if form.emergency_relation.errors else ""), placeholder="Spouse, Parent, etc.") }}
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-navy mb-3"><i class="bi bi-tags-fill text-warning me-2"></i> Fare Option & Discount</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-7">
+                            {{ form.fare_class_id.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.fare_class_id(class="form-select") }}
+                        </div>
+                        <div class="col-md-5">
+                            {{ form.promo_code.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.promo_code(class="form-control", placeholder="Try: SKY20 or WELCOME10") }}
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-sky btn-lg fw-bold text-navy py-3") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 shadow-sm border-0 sticky-top" style="top: 80px;">
+                <h5 class="fw-bold text-navy mb-3">Flight Summary</h5>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Flight:</span>
+                    <span class="fw-bold text-navy">{{ flight.schedule.flight_number }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Route:</span>
+                    <span>{{ flight.schedule.route.origin_airport.iata_code }} &rarr; {{ flight.schedule.route.destination_airport.iata_code }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Date:</span>
+                    <span>{{ flight.flight_date.strftime('%a, %b %d, %Y') }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Departure:</span>
+                    <span>{{ flight.schedule.scheduled_departure_time.strftime('%H:%M') }} UTC</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="text-muted">Aircraft:</span>
+                    <span>{{ flight.assigned_aircraft.model.model_name }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted">Base Fare + Tax:</span>
+                    <span class="fw-semibold">$285.00</span>
+                </div>
+                <div class="small text-muted mb-3">Instant confirmation upon submission.</div>
+                <div class="p-2 bg-light rounded text-center small text-muted">
+                    <i class="bi bi-shield-check text-success me-1"></i> Secure 256-bit SSL transaction
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

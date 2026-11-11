@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Create Flight Route{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card p-4 p-md-5 shadow-sm border-0 rounded-4">
+                <div class="mb-4">
+                    <a href="{{ url_for('admin.routes') }}" class="small text-muted text-decoration-none">&larr; Back to Routes</a>
+                    <h3 class="fw-bold text-navy mt-2">Create New Direct Route</h3>
+                    <p class="text-muted small">Server-side validated route definition</p>
+                </div>
+
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.origin_airport_id.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.origin_airport_id(class="form-select" + (" is-invalid" if form.origin_airport_id.errors else "")) }}
+                            {% for error in form.origin_airport_id.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.destination_airport_id.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.destination_airport_id(class="form-select" + (" is-invalid" if form.destination_airport_id.errors else "")) }}
+                            {% for error in form.destination_airport_id.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            {{ form.distance_km.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.distance_km(class="form-control" + (" is-invalid" if form.distance_km.errors else ""), placeholder="e.g. 5567.5") }}
+                            {% for error in form.distance_km.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.estimated_flight_minutes.label(class="form-label small fw-semibold text-muted") }}
+                            {{ form.estimated_flight_minutes(class="form-control" + (" is-invalid" if form.estimated_flight_minutes.errors else ""), placeholder="e.g. 420") }}
+                            {% for error in form.estimated_flight_minutes.errors %}
+                                <div class="invalid-feedback">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="mb-4 form-check">
+                        {{ form.is_active(class="form-check-input") }}
+                        {{ form.is_active.label(class="form-check-label small text-muted") }}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url_for('admin.routes') }}" class="btn btn-outline-secondary">Cancel</a>
+                        {{ form.submit(class="btn btn-success px-4 fw-bold") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

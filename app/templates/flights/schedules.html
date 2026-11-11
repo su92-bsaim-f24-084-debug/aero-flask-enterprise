@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Flight Schedules & Timetable{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1"><i class="bi bi-clock-history me-2 text-sky"></i> Master Flight Timetable</h3>
+            <p class="text-muted small mb-0">Scheduled direct routes and standard operational frequencies</p>
+        </div>
+        <a href="{{ url_for('flights.search') }}" class="btn btn-sky btn-sm text-navy fw-semibold px-3">Search Live Dates</a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Flight #</th>
+                        <th>Origin</th>
+                        <th>Destination</th>
+                        <th>Departure (UTC)</th>
+                        <th>Arrival (UTC)</th>
+                        <th>Duration</th>
+                        <th>Days of Week</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in schedules %}
+                        <tr>
+                            <td><span class="badge bg-navy text-sky fw-bold">{{ s.flight_number }}</span></td>
+                            <td>
+                                <strong>{{ s.route.origin_airport.iata_code }}</strong>
+                                <span class="text-muted small">({{ s.route.origin_airport.city.name }})</span>
+                            </td>
+                            <td>
+                                <strong>{{ s.route.destination_airport.iata_code }}</strong>
+                                <span class="text-muted small">({{ s.route.destination_airport.city.name }})</span>
+                            </td>
+                            <td class="fw-semibold text-navy">{{ s.scheduled_departure_time.strftime('%H:%M') }}</td>
+                            <td class="fw-semibold text-navy">{{ s.scheduled_arrival_time.strftime('%H:%M') }}</td>
+                            <td><span class="badge bg-light text-dark">{{ s.route.estimated_flight_minutes }}m</span></td>
+                            <td><span class="badge bg-info bg-opacity-10 text-info">{{ s.days_of_week }}</span></td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">No schedules configured yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

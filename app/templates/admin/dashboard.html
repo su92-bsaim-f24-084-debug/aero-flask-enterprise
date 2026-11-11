@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block title %}Admin Control Panel{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1"><i class="bi bi-speedometer2 me-2 text-primary"></i> Operations Control Dashboard</h3>
+            <p class="text-muted small mb-0">System performance, transaction metrics, and database state</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('admin.schema_browser') }}" class="btn btn-sky btn-sm text-navy fw-bold px-3">
+                <i class="bi bi-layers-fill me-1"></i> 51-Model Schema Explorer
+            </a>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Registered Users</div>
+                        <h3 class="fw-bold text-navy mb-0">{{ total_users }}</h3>
+                    </div>
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-people-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Active Bookings</div>
+                        <h3 class="fw-bold text-navy mb-0">{{ total_bookings }}</h3>
+                    </div>
+                    <div class="stat-icon bg-success bg-opacity-10 text-success">
+                        <i class="bi bi-ticket-perforated-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Operational Flights</div>
+                        <h3 class="fw-bold text-navy mb-0">{{ total_flights }}</h3>
+                    </div>
+                    <div class="stat-icon bg-info bg-opacity-10 text-info">
+                        <i class="bi bi-airplane-fill fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card p-3 shadow-sm border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div class="text-muted small">Active Aircraft</div>
+                        <h3 class="fw-bold text-navy mb-0">{{ total_fleet }}</h3>
+                    </div>
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-airplane-engines fs-4"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Soft Delete Audit Card -->
+    <div class="card p-4 shadow-sm border-0 mb-4 bg-light">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="fw-bold text-navy mb-1"><i class="bi bi-shield-check text-success me-2"></i> Soft Delete Integrity Status</h5>
+                <p class="text-muted small mb-0">Records flagged as deleted are retained for regulatory and audit compliance.</p>
+            </div>
+            <div class="d-flex gap-3 text-end">
+                <div>
+                    <span class="badge bg-danger fs-6 px-3 py-2">{{ soft_deleted_bookings }}</span>
+                    <div class="fs-xs text-muted mt-1">Soft-Deleted Bookings</div>
+                </div>
+                <div>
+                    <span class="badge bg-secondary fs-6 px-3 py-2">{{ soft_deleted_aircraft }}</span>
+                    <div class="fs-xs text-muted mt-1">Archived Aircraft</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Management Hub -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card p-4 shadow-sm border-0 text-center">
+                <i class="bi bi-geo-alt-fill text-primary fs-1 mb-2"></i>
+                <h5 class="fw-bold text-navy">Airports & Hubs</h5>
+                <p class="text-muted small">Manage international destination hubs and runways</p>
+                <a href="{{ url_for('admin.airports') }}" class="btn btn-outline-primary btn-sm">Manage Airports</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 shadow-sm border-0 text-center">
+                <i class="bi bi-signpost-2-fill text-success fs-1 mb-2"></i>
+                <h5 class="fw-bold text-navy">Direct Routes</h5>
+                <p class="text-muted small">Configure origin-destination pairs and flight durations</p>
+                <a href="{{ url_for('admin.routes') }}" class="btn btn-outline-success btn-sm">Manage Routes</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4 shadow-sm border-0 text-center">
+                <i class="bi bi-tag-fill text-warning fs-1 mb-2"></i>
+                <h5 class="fw-bold text-navy">Promo Codes</h5>
+                <p class="text-muted small">Issue discount campaigns and monitor usage limits</p>
+                <a href="{{ url_for('admin.promos') }}" class="btn btn-outline-warning btn-sm">Manage Promos</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+            <h5 class="fw-bold text-navy mb-0">Recent Commercial Reservations</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>PNR</th>
+                        <th>User</th>
+                        <th>Booking Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in recent_bookings %}
+                        <tr>
+                            <td><strong>{{ b.booking_reference }}</strong></td>
+                            <td>{{ b.user.username }}</td>
+                            <td>{{ b.booking_date.strftime('%b %d, %Y %H:%M') }}</td>
+                            <td class="fw-bold text-navy">${{ "%.2f"|format(b.total_amount) }}</td>
+                            <td>
+                                {% if b.booking_status == 'Confirmed' %}
+                                    <span class="badge bg-success">{{ b.booking_status }}</span>
+                                {% else %}
+                                    <span class="badge bg-danger">{{ b.booking_status }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-4 text-muted">No bookings recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

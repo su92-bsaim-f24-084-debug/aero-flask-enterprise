@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% block title %}Search Flights{% endblock %}
+
+{% block content %}
+<div class="bg-navy py-4 text-white">
+    <div class="container">
+        <h3 class="fw-bold mb-1"><i class="bi bi-airplane-engines me-2 text-sky"></i> Available Flights & Fares</h3>
+        <p class="text-light text-opacity-75 small mb-0">Search operational routes and compare cabin classes</p>
+    </div>
+</div>
+
+<div class="container py-4">
+    <!-- Search Filter Card -->
+    <div class="card p-4 shadow-sm border-0 mb-4 rounded-3">
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    {{ form.origin_id.label(class="form-label small fw-semibold text-muted") }}
+                    {{ form.origin_id(class="form-select" + (" is-invalid" if form.origin_id.errors else "")) }}
+                    {% for error in form.origin_id.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-3">
+                    {{ form.destination_id.label(class="form-label small fw-semibold text-muted") }}
+                    {{ form.destination_id(class="form-select" + (" is-invalid" if form.destination_id.errors else "")) }}
+                    {% for error in form.destination_id.errors %}
+                        <div class="invalid-feedback">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="col-md-2">
+                    {{ form.flight_date.label(class="form-label small fw-semibold text-muted") }}
+                    {{ form.flight_date(class="form-control" + (" is-invalid" if form.flight_date.errors else "")) }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.cabin_class_id.label(class="form-label small fw-semibold text-muted") }}
+                    {{ form.cabin_class_id(class="form-select") }}
+                </div>
+                <div class="col-md-2">
+                    {{ form.submit(class="btn btn-sky w-100 fw-bold text-navy py-2") }}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    {% if has_searched %}
+        <h5 class="fw-bold text-navy mb-3">Found {{ flights|length }} Operational Flight(s)</h5>
+        {% if flights %}
+            <div class="row g-3">
+                {% for flight in flights %}
+                    <div class="col-12">
+                        <div class="card p-4 shadow-sm flight-ticket-card">
+                            <div class="row align-items-center gy-3">
+                                <div class="col-md-2">
+                                    <span class="badge bg-navy px-3 py-2 text-sky fw-bold">{{ flight.schedule.flight_number }}</span>
+                                    <div class="small text-muted mt-1">{{ flight.assigned_aircraft.model.model_name }}</div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <h4 class="fw-bold mb-0 text-navy">{{ flight.schedule.route.origin_airport.iata_code }}</h4>
+                                            <div class="small fw-semibold">{{ flight.schedule.scheduled_departure_time.strftime('%H:%M') }}</div>
+                                            <small class="text-muted">{{ flight.schedule.route.origin_airport.city.name }}</small>
+                                        </div>
+                                        <div class="text-center px-3">
+                                            <div class="text-muted fs-xs">{{ flight.schedule.route.estimated_flight_minutes }} mins</div>
+                                            <div class="d-flex align-items-center">
+                                                <span class="border-top border-2 border-secondary flex-grow-1" style="width: 50px;"></span>
+                                                <i class="bi bi-airplane-fill text-sky mx-2"></i>
+                                                <span class="border-top border-2 border-secondary flex-grow-1" style="width: 50px;"></span>
+                                            </div>
+                                            <div class="text-success fs-xs fw-semibold">Non-stop</div>
+                                        </div>
+                                        <div>
+                                            <h4 class="fw-bold mb-0 text-navy">{{ flight.schedule.route.destination_airport.iata_code }}</h4>
+                                            <div class="small fw-semibold">{{ flight.schedule.scheduled_arrival_time.strftime('%H:%M') }}</div>
+                                            <small class="text-muted">{{ flight.schedule.route.destination_airport.city.name }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-center text-md-start">
+                                    <div class="fs-xs text-muted">Flight Date</div>
+                                    <div class="fw-semibold">{{ flight.flight_date.strftime('%a, %b %d') }}</div>
+                                    <span class="badge bg-info bg-opacity-10 text-info mt-1">{{ flight.status }}</span>
+                                </div>
+                                <div class="col-md-3 text-md-end text-center">
+                                    <div class="fs-xs text-muted">Starting from</div>
+                                    <h4 class="fw-bold text-navy mb-2">$285.00</h4>
+                                    <div class="d-flex gap-2 justify-content-md-end">
+                                        <a href="{{ url_for('flights.details', id=flight.id) }}" class="btn btn-outline-secondary btn-sm">Details</a>
+                                        <a href="{{ url_for('bookings.create', flight_id=flight.id) }}" class="btn btn-sky btn-sm fw-bold text-navy px-3">Book Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card p-5 text-center border-0 shadow-sm">
+                <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                <h5 class="fw-bold text-navy mt-3">No direct flights available for the selected criteria</h5>
+                <p class="text-muted small">Try selecting different travel dates or explore our timetable schedules.</p>
+                <div>
+                    <a href="{{ url_for('flights.schedules') }}" class="btn btn-outline-primary btn-sm">View Full Flight Schedule</a>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="card p-5 text-center border-0 shadow-sm">
+            <i class="bi bi-compass fs-1 text-sky"></i>
+            <h5 class="fw-bold text-navy mt-3">Ready for departure?</h5>
+            <p class="text-muted small mb-0">Select your departure hub, destination, and travel date above to view real-time flight inventory.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

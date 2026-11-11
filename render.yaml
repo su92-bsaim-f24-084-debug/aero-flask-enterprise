@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aero-flask-enterprise
+    env: python
+    buildCommand: "pip install -r requirements.txt && python seed.py"
+    startCommand: "gunicorn wsgi:app"
+    envVars:
+      - key: FLASK_CONFIG
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.10.11

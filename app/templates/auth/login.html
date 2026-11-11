@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Sign In{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card p-4 shadow-sm border-0 rounded-4">
+                <div class="text-center mb-4">
+                    <div class="stat-icon bg-navy text-sky mx-auto mb-3">
+                        <i class="bi bi-person-fill-lock fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold text-navy">Flight Crew & Member Sign In</h3>
+                    <p class="text-muted small">Access your bookings, boarding passes, and member perks</p>
+                </div>
+
+                <form method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.username_or_email.label(class="form-label small fw-semibold text-muted") }}
+                        {{ form.username_or_email(class="form-control" + (" is-invalid" if form.username_or_email.errors else ""), placeholder="Username or email") }}
+                        {% for error in form.username_or_email.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label small fw-semibold text-muted") }}
+                        {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), placeholder="••••••••") }}
+                        {% for error in form.password.errors %}
+                            <div class="invalid-feedback">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3 form-check">
+                        {{ form.remember_me(class="form-check-input") }}
+                        {{ form.remember_me.label(class="form-check-label small text-muted") }}
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        {{ form.submit(class="btn btn-sky py-2 fw-bold text-navy") }}
+                    </div>
+                </form>
+
+                <div class="text-center small text-muted mt-2">
+                    Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-primary fw-semibold text-decoration-none">Register here</a>
+                </div>
+
+                <hr class="my-4">
+                <div class="p-2 bg-light rounded text-center small text-muted">
+                    <strong>Demo Admin:</strong> <code>admin</code> / <code>AdminPass123!</code><br>
+                    <strong>Demo Customer:</strong> <code>passenger1</code> / <code>Pass123!</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

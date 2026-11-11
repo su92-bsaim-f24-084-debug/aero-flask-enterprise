@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}Manage Routes{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-navy mb-1"><i class="bi bi-signpost-2 me-2 text-success"></i> Direct Flight Routes</h3>
+            <p class="text-muted small mb-0">City-pair connections, distances, and flight durations</p>
+        </div>
+        <a href="{{ url_for('admin.create_route') }}" class="btn btn-success btn-sm px-3">
+            <i class="bi bi-plus-lg me-1"></i> Add Route
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Origin Airport</th>
+                        <th>Destination Airport</th>
+                        <th>Distance (km)</th>
+                        <th>Estimated Duration</th>
+                        <th>Status</th>
+                        <th class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in routes %}
+                        <tr>
+                            <td>
+                                <strong>{{ r.origin_airport.iata_code }}</strong>
+                                <span class="text-muted small ms-1">({{ r.origin_airport.name }})</span>
+                            </td>
+                            <td>
+                                <strong>{{ r.destination_airport.iata_code }}</strong>
+                                <span class="text-muted small ms-1">({{ r.destination_airport.name }})</span>
+                            </td>
+                            <td class="fw-semibold">{{ r.distance_km }} km</td>
+                            <td><span class="badge bg-light text-dark">{{ r.estimated_flight_minutes }} mins</span></td>
+                            <td>
+                                {% if r.is_active %}
+                                    <span class="badge bg-success bg-opacity-10 text-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <form action="{{ url_for('admin.delete_route', id=r.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Soft delete this route?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Soft Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No flight routes configured.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

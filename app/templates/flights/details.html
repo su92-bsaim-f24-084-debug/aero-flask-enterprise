@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}Flight {{ flight.schedule.flight_number }} Details{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row gy-4">
+        <div class="col-lg-8">
+            <div class="card p-4 shadow-sm border-0 mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-navy text-sky fs-6 px-3 py-2">{{ flight.schedule.flight_number }}</span>
+                    <span class="badge bg-success bg-opacity-10 text-success fs-6">{{ flight.status }}</span>
+                </div>
+
+                <div class="row align-items-center my-4 text-center">
+                    <div class="col-4 text-md-start">
+                        <h2 class="fw-bold text-navy mb-0">{{ flight.schedule.route.origin_airport.iata_code }}</h2>
+                        <div class="fw-semibold">{{ flight.schedule.route.origin_airport.name }}</div>
+                        <div class="text-muted small">{{ flight.schedule.route.origin_airport.city.name }}, {{ flight.schedule.route.origin_airport.city.country.name }}</div>
+                        <div class="badge bg-light text-dark mt-2">Gate: {{ flight.departure_gate.gate_number if flight.departure_gate else 'TBD' }}</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="small text-muted mb-1">{{ flight.schedule.route.estimated_flight_minutes }} minutes</div>
+                        <i class="bi bi-airplane-fill text-sky fs-3"></i>
+                        <div class="fs-xs text-muted mt-1">{{ flight.schedule.route.distance_km }} km</div>
+                    </div>
+                    <div class="col-4 text-md-end">
+                        <h2 class="fw-bold text-navy mb-0">{{ flight.schedule.route.destination_airport.iata_code }}</h2>
+                        <div class="fw-semibold">{{ flight.schedule.route.destination_airport.name }}</div>
+                        <div class="text-muted small">{{ flight.schedule.route.destination_airport.city.name }}, {{ flight.schedule.route.destination_airport.city.country.name }}</div>
+                        <div class="badge bg-light text-dark mt-2">Gate: {{ flight.arrival_gate.gate_number if flight.arrival_gate else 'TBD' }}</div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="fw-bold text-navy mb-3">Assigned Aircraft & Cabin Configuration</h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <div class="small text-muted">Aircraft Model</div>
+                            <div class="fw-bold text-navy">{{ flight.assigned_aircraft.model.model_name }}</div>
+                            <div class="small text-muted mt-1">Manufacturer: {{ flight.assigned_aircraft.model.manufacturer.name }}</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <div class="small text-muted">Tail Number (Registration)</div>
+                            <div class="fw-bold text-navy">{{ flight.assigned_aircraft.tail_number }}</div>
+                            <div class="small text-muted mt-1">Total Flight Hours: {{ flight.assigned_aircraft.total_flight_hours }} hrs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fares Available -->
+            <div class="card p-4 shadow-sm border-0">
+                <h5 class="fw-bold text-navy mb-3">Cabin Classes & Fares</h5>
+                {% if prices %}
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Cabin Class</th>
+                                    <th>Fare Type</th>
+                                    <th>Base Fare</th>
+                                    <th>Taxes</th>
+                                    <th>Available Seats</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for price in prices %}
+                                    <tr>
+                                        <td class="fw-semibold">{{ price.cabin_class.name }}</td>
+                                        <td><span class="badge bg-secondary">{{ price.fare_class.name }}</span></td>
+                                        <td class="fw-bold text-navy">${{ "%.2f"|format(price.base_fare) }}</td>
+                                        <td class="text-muted">${{ "%.2f"|format(price.tax_amount) }}</td>
+                                        <td><span class="badge bg-success">{{ price.available_seats }} seats</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted small">Standard fare pricing applies ($250.00 base + $35.00 tax).</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card p-4 shadow-sm border-0 sticky-top" style="top: 80px;">
+                <h5 class="fw-bold text-navy mb-3">Ready to Fly?</h5>
+                <p class="small text-muted">
+                    Lock in your itinerary today. E-tickets and instant boarding passes generated upon booking confirmation.
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('bookings.create', flight_id=flight.id) }}" class="btn btn-sky btn-lg fw-bold text-navy">
+                        <i class="bi bi-ticket-perforated-fill me-2"></i> Book This Flight
+                    </a>
+                    <a href="{{ url_for('flights.search') }}" class="btn btn-outline-secondary">
+                        Back to Search
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

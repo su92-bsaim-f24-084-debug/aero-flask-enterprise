@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% block title %}Welcome to Aero-Flask Enterprise{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Flight Search -->
+<section class="hero-banner shadow-sm">
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row align-items-center gy-4">
+            <div class="col-lg-6">
+                <span class="badge bg-sky text-navy px-3 py-2 rounded-pill text-uppercase mb-3 fw-bold">Next-Gen Airline Platform</span>
+                <h1 class="display-4 fw-extrabold text-white mb-3">Elevate Your Travel Experience</h1>
+                <p class="lead text-light text-opacity-90 mb-4">
+                    Book commercial flights, track live fleet schedules, and manage bookings seamlessly across global hubs powered by Flask and 51 relational models.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <a href="{{ url_for('flights.search') }}" class="btn btn-sky btn-lg px-4 fw-bold">
+                        <i class="bi bi-search me-2"></i> Book Flights
+                    </a>
+                    <a href="{{ url_for('main.about') }}" class="btn btn-outline-light btn-lg px-4">
+                        <i class="bi bi-diagram-3 me-2"></i> 51-Table Schema
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <!-- Quick Search Card -->
+                <div class="card shadow-lg border-0 bg-white text-dark p-4 rounded-4">
+                    <h5 class="fw-bold mb-3 d-flex align-items-center text-navy">
+                        <i class="bi bi-airplane-fill text-sky me-2"></i> Quick Flight Search
+                    </h5>
+                    <form action="{{ url_for('flights.search') }}" method="GET">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Departure Airport</label>
+                                <select name="origin_id" class="form-select form-select-lg fs-6" required>
+                                    <option value="" disabled selected>Select Origin</option>
+                                    {% for airport in airports %}
+                                        <option value="{{ airport.id }}">{{ airport.iata_code }} - {{ airport.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Destination Airport</label>
+                                <select name="destination_id" class="form-select form-select-lg fs-6" required>
+                                    <option value="" disabled selected>Select Destination</option>
+                                    {% for airport in airports %}
+                                        <option value="{{ airport.id }}">{{ airport.iata_code }} - {{ airport.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Date of Travel</label>
+                                <input type="date" name="flight_date" class="form-control form-control-lg fs-6" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Trip Type</label>
+                                <select class="form-select form-select-lg fs-6">
+                                    <option selected>One Way</option>
+                                    <option>Round Trip</option>
+                                </select>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-sky w-100 py-3 fw-bold text-navy fs-6">
+                                    <i class="bi bi-arrow-right-circle-fill me-2"></i> Check Flights & Fares
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- System KPI Stats Counters -->
+<section class="py-5 bg-white border-bottom">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="stat-icon bg-primary bg-opacity-10 text-primary mx-auto mb-2">
+                        <i class="bi bi-airplane-engines fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-navy">{{ aircraft_count }}</h3>
+                    <p class="text-muted small mb-0">Active Fleet</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="stat-icon bg-success bg-opacity-10 text-success mx-auto mb-2">
+                        <i class="bi bi-signpost-2 fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-navy">{{ routes_count }}</h3>
+                    <p class="text-muted small mb-0">Direct Flight Routes</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="stat-icon bg-warning bg-opacity-10 text-warning mx-auto mb-2">
+                        <i class="bi bi-ticket-perforated fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-navy">{{ bookings_count }}</h3>
+                    <p class="text-muted small mb-0">Confirmed Bookings</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="p-3">
+                    <div class="stat-icon bg-info bg-opacity-10 text-info mx-auto mb-2">
+                        <i class="bi bi-database-check fs-3"></i>
+                    </div>
+                    <h3 class="fw-bold mb-1 text-navy">51</h3>
+                    <p class="text-muted small mb-0">Relational Models (40+ Req)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upcoming Flights Showcase -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-navy mb-1">Featured Flight Departures</h3>
+                <p class="text-muted small mb-0">Explore scheduled routes available for online booking</p>
+            </div>
+            <a href="{{ url_for('flights.schedules') }}" class="btn btn-outline-primary btn-sm">View All Schedules &rarr;</a>
+        </div>
+
+        <div class="row g-4">
+            {% for flight in upcoming_flights %}
+                <div class="col-md-4">
+                    <div class="card h-100 flight-ticket-card shadow-sm p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-navy text-white">{{ flight.schedule.flight_number }}</span>
+                            <span class="badge bg-success bg-opacity-10 text-success">{{ flight.status }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center my-2">
+                            <div>
+                                <h4 class="fw-bold mb-0 text-navy">{{ flight.schedule.route.origin_airport.iata_code }}</h4>
+                                <small class="text-muted">{{ flight.schedule.route.origin_airport.city.name }}</small>
+                            </div>
+                            <div class="text-center px-2">
+                                <i class="bi bi-arrow-right text-sky fs-4"></i>
+                                <div class="fs-xs text-muted">{{ flight.schedule.route.estimated_flight_minutes }} mins</div>
+                            </div>
+                            <div class="text-end">
+                                <h4 class="fw-bold mb-0 text-navy">{{ flight.schedule.route.destination_airport.iata_code }}</h4>
+                                <small class="text-muted">{{ flight.schedule.route.destination_airport.city.name }}</small>
+                            </div>
+                        </div>
+                        <hr class="my-2 border-dashed">
+                        <div class="d-flex justify-content-between align-items-center small text-muted mb-3">
+                            <span><i class="bi bi-calendar3 me-1"></i> {{ flight.flight_date.strftime('%b %d, %Y') }}</span>
+                            <span><i class="bi bi-clock me-1"></i> {{ flight.schedule.scheduled_departure_time.strftime('%H:%M') }}</span>
+                        </div>
+                        <a href="{{ url_for('flights.details', id=flight.id) }}" class="btn btn-sm btn-outline-navy w-100 fw-semibold">
+                            View Flight & Select Seats
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-airplane text-muted fs-1"></i>
+                    <p class="text-muted mt-2">No upcoming flights found. Seed the database to load operational schedules.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
